@@ -5,35 +5,29 @@ import android.os.Handler;
 
 import java.lang.ref.WeakReference;
 
-import com.mapapp.bos.mapapp.Data.OkHttpImpl;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.mapapp.bos.mapapp.Data.LocationManagerImpl;
+import com.mapapp.bos.mapapp.Data.MapManagerImpl;
 
-import com.mapapp.bos.mapapp.R;
 import com.mapapp.bos.mapapp.activity.Mvp_inter;
 import com.mapapp.bos.mapapp.activity.model.MainModel;
-import com.mapapp.bos.mapapp.common.Weather;
+import com.mapapp.bos.mapapp.common.LocationE;
 
 /**
  * Created by Bos on 2016-12-04.
  */
-public class MainPresenter implements Mvp_inter.PresenterOps,MainModel.ModelResult {
+public class MainPresenter implements Mvp_inter.PresenterOps,MainModel.ModelMapResult,MainModel.ModelLocationResult {
 
-    // View reference. We use as a WeakReference
-    // because the Activity could be destroyed at any time
-    // and we don't want to create a memory leak
     private WeakReference<Mvp_inter.ViewOps> mView;
-    // Model reference
     private Mvp_inter.PresenterToModel mModel;
-
     private Handler handler;
 
-    /**
-     * Presenter Constructor
-     * @param view  MainActivity
-     */
+
     public MainPresenter(Mvp_inter.ViewOps view) {
         mView = new WeakReference<>(view);
         handler = new Handler();
-        mModel = new MainModel(new OkHttpImpl());
+        mModel = new MainModel(new MapManagerImpl(getView().getSupportMapFragment()), new LocationManagerImpl(getView().getContext() ));
     }
 
 
@@ -41,43 +35,37 @@ public class MainPresenter implements Mvp_inter.PresenterOps,MainModel.ModelResu
         if ( mView != null )
             return mView.get();
         else
-            throw new NullPointerException("View is unavailable");
+        throw new NullPointerException("View is unavailable");
     }
 
     @Override
     public void onStartup(Bundle savedInstanceState) {
         if(savedInstanceState == null) {
-           // getView().showMainMenu();
+            mModel.prepareMapData(this);
         }
-
     }
 
-   // @Override
-    public void onCitySelected(final int id) {
-        //getView().showProgressBar();
-        //getView().hideListView();
-
-        //String cityName= getView().getViewResources().getStringArray(R.array.cityName)[id];
-       // mModel.downloadWeatherData(cityName, this);
+    @Override
+    public void permissionGranted() {
+        mModel.startGps(this);
     }
 
-    private void handleWeatherResult(Weather weather) {
-       // getView().hideProgressBar();
-       // getView().loadResultFragment(weather);
+    @Override
+    public void onMapReady(GoogleMap map) {
+        getView().setupMap(map);
+        mModel.startGps(this);
+
     }
 
 
     @Override
-    public void onwWeatherReady(final Weather weather) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                handleWeatherResult(weather);
-            }
-        });
+    public void onLocationChange(LocationE location) {
+        LatLng latLng = new LatLng(location.lat, location.lng);
+        getView().printMarketAndMoveCamera(latLng,"You");
     }
 
     @Override
-    public void onDownloadError(String msg) {
+    public void onLocationSetupFailed() {
+        getView().requestGpsPermission();
     }
 }

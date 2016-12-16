@@ -1,9 +1,14 @@
 package com.mapapp.bos.mapapp.activity;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.mapapp.bos.mapapp.activity.model.MainModel;
+import com.mapapp.bos.mapapp.common.LocationE;
 
 
 /**
@@ -24,7 +29,15 @@ public interface Mvp_inter {
         //Context getActivityContext();
 
         Resources getViewResources();
+        void setupMap(GoogleMap map);
+        void printMarketAndMoveCamera(LatLng latLng, String text);
 
+        SupportMapFragment getSupportMapFragment();
+
+
+        Context getContext();
+
+        void requestGpsPermission();
     }
 
     /**
@@ -34,6 +47,8 @@ public interface Mvp_inter {
      */
     interface PresenterOps {
         void onStartup(Bundle savedInstanceState);
+
+        void permissionGranted();
     }
 
 
@@ -44,6 +59,27 @@ public interface Mvp_inter {
      *      Presenter to Model
      */
     interface PresenterToModel {
-        void downloadWeatherData(String city, MainModel.ModelResult callBack);
+        void prepareMapData(MainModel.ModelMapResult callBack);
+
+        void startGps(MainModel.ModelLocationResult result);
+    }
+
+    interface MapManager {
+        void setupMap(Mvp_inter.MapManagerResult result);
+    }
+    interface MapManagerResult {
+       void  onMapReady(GoogleMap map);
+
+
+    }
+
+
+    interface LocationManager {
+        void initGps(Mvp_inter.LocationManagerResult result);
+    }
+    interface LocationManagerResult {
+        void onLocationChange(LocationE location);
+
+        void onLocationSetupFailed();
     }
 }
