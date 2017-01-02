@@ -9,6 +9,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.mapapp.bos.mapapp.activity.model.MainModel;
 import com.mapapp.bos.mapapp.common.LocationE;
+import com.mapapp.bos.mapapp.common.PlaceE;
+import com.mapapp.bos.mapapp.gson.Place;
+import com.mapapp.bos.mapapp.gson.PlacesResult;
 
 
 /**
@@ -38,6 +41,23 @@ public interface Mvp_inter {
         Context getContext();
 
         void requestGpsPermission();
+
+        void hideMap();
+        void showMap();
+
+        void hideProgressBar();
+        void showProgressBar();
+
+        void hideListView();
+
+        void showListView();
+
+        void hideSearchBar();
+
+        void showSearchBar();
+
+        void showPlaceList(PlacesResult place);
+        void showMsg(String s);
     }
 
     /**
@@ -49,6 +69,12 @@ public interface Mvp_inter {
         void onStartup(Bundle savedInstanceState);
 
         void permissionGranted();
+
+        void onSearchConfirmed(CharSequence charSequence);
+
+        void onSearchStateChanged(boolean b);
+
+        void onPlaceSelected(int pos);
     }
 
 
@@ -62,6 +88,9 @@ public interface Mvp_inter {
         void prepareMapData(MainModel.ModelMapResult callBack);
 
         void startGps(MainModel.ModelLocationResult result);
+
+
+        void downloadPlaceData(CharSequence charSequence, LocationE currentLoc, MainModel.ModelPlacesResult result);
     }
 
     interface MapManager {
@@ -81,5 +110,14 @@ public interface Mvp_inter {
         void onLocationChange(LocationE location);
 
         void onLocationSetupFailed();
+    }
+
+    interface PlaceFinder {
+
+        void getPlaceData(CharSequence charSequence, LocationE currentLoc, PlaceFinderResult placeFinderResult);
+    }
+
+    interface PlaceFinderResult {
+        void onPlacesResult(PlacesResult result);
     }
 }
