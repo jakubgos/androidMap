@@ -19,6 +19,7 @@ import com.mapapp.bos.mapapp.gson.PlacesResult;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -51,7 +52,7 @@ public class PlaceFinderImpl implements Mvp_inter.PlaceFinder {
                 PlaceE placeResult = new PlaceE();
                 try {
 
-                    url = new URL(String.format(OPEN_WEATHER_MAP_API,currentLoc.lat,currentLoc.lng,charSequence.toString()));
+                    url = new URL(String.format(Locale.US,OPEN_WEATHER_MAP_API,currentLoc.lat,currentLoc.lng,charSequence.toString()));
 
                     Request request = new Request.Builder()
                             .url(url)
